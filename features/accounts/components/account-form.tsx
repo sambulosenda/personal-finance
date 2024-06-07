@@ -48,11 +48,11 @@ export const AccountForm = ({
   const handleDelete = () => {
     onDelete?.();
   };
-  
+
   return (
     <Form {...form}>
-      <form 
-        onSubmit={form.handleSubmit(handleSubmit)} 
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
         className="space-y-4 pt-4"
       >
         <FormField
@@ -60,9 +60,7 @@ export const AccountForm = ({
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                Name
-              </FormLabel>
+              <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input
                   disabled={disabled}
@@ -78,6 +76,7 @@ export const AccountForm = ({
         </Button>
         {!!id && (
           <Button
+            id={id}
             type="button"
             disabled={disabled}
             onClick={handleDelete}
@@ -90,5 +89,5 @@ export const AccountForm = ({
         )}
       </form>
     </Form>
-  )
+  );
 };
