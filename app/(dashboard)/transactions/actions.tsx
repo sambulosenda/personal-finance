@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { useOpenTransaction } from "@/features/transactions/hooks/use-open-transaction";
 
 type Props = {
   id: string;
@@ -25,7 +26,7 @@ export const Actions = ({ id }: Props) => {
   );
 
   const deleteMutation = useDeleteAccount(id);
-  const { onOpen } = useOpenAccount();
+  const { onOpen } = useOpenTransaction();
 
   const handleDelete = async () => {
     const ok = await confirm();
