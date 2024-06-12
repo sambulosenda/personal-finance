@@ -72,6 +72,7 @@ const app = new Hono()
       "json",
       insertAccountSchema.pick({
         name: true,
+        
       })
     ),
     async (c) => {

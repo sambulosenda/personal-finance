@@ -3,8 +3,10 @@ import { InferRequestType, InferResponseType } from "hono";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { client } from "@/lib/hono";
+
 type ResponseType = InferResponseType<typeof client.api.transactions.$post>;
 type RequestType = InferRequestType<typeof client.api.transactions.$post>["json"];
+
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
 
@@ -23,7 +25,7 @@ export const useCreateTransaction = () => {
       queryClient.invalidateQueries({ queryKey: ["summary"] });
     },
     onError: () => {
-      toast.error("Failed to create Transaction");
+      toast.error("Failed to create transaction");
     },
   });
 

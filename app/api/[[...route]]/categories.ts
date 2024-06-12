@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle";
-import { categories, insertCategoriesSchema } from "@/db/schema";
+import { categories, insertCategorySchema } from "@/db/schema";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
@@ -71,7 +71,7 @@ const app = new Hono()
     clerkMiddleware(),
     zValidator(
       "json",
-      insertCategoriesSchema.pick({
+      insertCategorySchema.pick({
         name: true,
       })
     ),
@@ -139,7 +139,7 @@ const app = new Hono()
     ),
     zValidator(
       "json",
-      insertCategoriesSchema.pick({
+      insertCategorySchema.pick({
         name: true,
       })
     ),
@@ -194,7 +194,7 @@ const app = new Hono()
       const [data] = await db
         .delete(categories)
         .where(and(eq(categories.userId, auth.userId), eq(categories.id, id)))
-        .returning({id: categories.id});
+        .returning({ id: categories.id });
 
       if (!data) {
         return c.json({ error: "Not found" }, 404);

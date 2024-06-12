@@ -3,9 +3,9 @@ import {
   SheetContent,
   SheetDescription,
   SheetHeader,
-  SheetTitle
+  SheetTitle,
 } from "@/components/ui/sheet";
-import { insertCategoriesSchema } from "@/db/schema";
+import { insertCategorySchema } from "@/db/schema";
 import { useDeleteCategory } from "@/features/categories/api/use-delete-category";
 import { useEditCategory } from "@/features/categories/api/use-edit-category";
 import { useGetCategory } from "@/features/categories/api/use-get-category";
@@ -15,7 +15,7 @@ import { Loader2 } from "lucide-react";
 import { z } from "zod";
 import { CategoryForm } from "./category-form";
 
-const formSchema = insertCategoriesSchema.pick({
+const formSchema = insertCategorySchema.pick({
   name: true,
 });
 
@@ -51,7 +51,7 @@ export const EditCategorySheet = () => {
       deleteMutation.mutate(undefined, {
         onSuccess: () => {
           onClose();
-        }
+        },
       });
     }
   };

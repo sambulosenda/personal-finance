@@ -7,13 +7,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { insertCategoriesSchema } from "@/db/schema";
+import { insertCategorySchema } from "@/db/schema";
 import { z } from "zod";
 import { useCreateCategory } from "@/features/categories/api/use-create-category";
 import { CategoryForm } from "@/features/categories/components/category-form";
 import { useNewCategory } from "@/features/categories/hooks/use-new-category";
 
-const formSchema = insertCategoriesSchema.pick({
+const formSchema = insertCategorySchema.pick({
   name: true,
 });
 
