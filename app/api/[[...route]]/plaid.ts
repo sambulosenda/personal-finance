@@ -1,5 +1,11 @@
 import { db } from "@/db/drizzle";
-import { connectedBanks } from "@/db/schema";
+import {
+  accounts,
+  categories,
+  connectedBanks,
+  transactions,
+} from "@/db/schema";
+import { convertAmountToMiliunits } from "@/lib/utils";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { zValidator } from "@hono/zod-validator";
 import { createId } from "@paralleldrive/cuid2";
@@ -33,7 +39,7 @@ const app = new Hono()
     if (!auth?.userId) {
       return c.json({ error: "Not authenticated" }, 401);
     }
-    
+
     // Create a Link Token for the authenticated user
     const token = await client.linkTokenCreate({
       user: {
@@ -80,7 +86,76 @@ const app = new Hono()
         })
         .returning();
 
-      return c.json({ data: exchangeToken.data.access_token }, 200);
+      const plaidTransactions = await client.transactionsSync({
+        access_token: connectedBank.accessToken,
+      });
+
+      const plaidAccounts = await client.accountsGet({
+        access_token: connectedBank.accessToken,
+      });
+
+      const plaidCategories = await client.categoriesGet({});
+
+      const newAccounts = await db
+        .insert(accounts)
+        .values(
+          plaidAccounts.data.accounts.map((account) => ({
+            id: createId(),
+            name: account.name,
+            userId: auth.userId,
+            plaidID: account.account_id,
+          }))
+        )
+        .returning();
+
+      const newCategories = await db
+        .insert(categories)
+        .values(
+          plaidCategories.data.categories.map((category) => ({
+            id: createId(),
+            name: category.hierarchy.join(", "),
+            userId: auth.userId,
+            plaidID: category.category_id,
+          }))
+        )
+        .returning();
+
+      const newTransactionsValues = plaidTransactions.data.added.reduce(
+        (acc, transaction) => {
+          const account = newAccounts.find(
+            (account) => account.plaidId === transaction.account_id
+          );
+          
+          const category = newCategories.find(
+            (category) => category.plaidId === transaction.category_id
+          );
+
+          const amountInMiliunits = convertAmountToMiliunits(
+            transaction.amount
+          );
+
+          if (account) {
+            acc.push({
+              id: createId(),
+              amount: amountInMiliunits,
+              payee: transaction.merchant_name || transaction.name,
+              notes: transaction.name,
+              date: new Date(transaction.date),
+              accountId: account.id,
+              categoryId: category?.id,
+            });
+          }
+
+          return acc;
+        },
+        [] as (typeof transactions.$inferInsert)[]
+      );
+
+      if (newTransactionsValues.length > 0) {
+        await db.insert(transactions).values(newTransactionsValues);
+      }
+
+      return c.json({ ok: true }, 200);
     }
   );
 export default app;
