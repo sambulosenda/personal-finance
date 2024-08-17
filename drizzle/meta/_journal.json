@@ -36,6 +36,27 @@
       "when": 1717870675260,
       "tag": "0004_lame_luminals",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1723916607992,
+      "tag": "0005_curly_mongu",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1723917546947,
+      "tag": "0006_brainy_grim_reaper",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1723917632065,
+      "tag": "0007_married_jack_murdock",
+      "breakpoints": true
     }
   ]
 }

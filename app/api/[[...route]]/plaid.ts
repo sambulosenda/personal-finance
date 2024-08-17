@@ -1,5 +1,8 @@
+import { db } from "@/db/drizzle";
+import { connectedBanks } from "@/db/schema";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { zValidator } from "@hono/zod-validator";
+import { createId } from "@paralleldrive/cuid2";
 import { Hono } from "hono";
 import {
   Configuration,
@@ -30,7 +33,8 @@ const app = new Hono()
     if (!auth?.userId) {
       return c.json({ error: "Not authenticated" }, 401);
     }
-
+    
+    // Create a Link Token for the authenticated user
     const token = await client.linkTokenCreate({
       user: {
         client_user_id: auth.userId,
@@ -55,15 +59,27 @@ const app = new Hono()
     async (c) => {
       const auth = getAuth(c);
 
-      const { publicToken} = c.req.valid("json");
+      const { publicToken } = c.req.valid("json");
 
       if (!auth?.userId) {
         return c.json({ error: "Not authenticated" }, 401);
       }
 
+      // Exchange the public token for an access token
       const exchangeToken = await client.itemPublicTokenExchange({
         public_token: publicToken,
       });
+
+      // Store the access token in the database
+      const [connectedBank] = await db
+        .insert(connectedBanks)
+        .values({
+          id: createId(),
+          userId: auth.userId,
+          accessToken: exchangeToken.data.access_token,
+        })
+        .returning();
+
       return c.json({ data: exchangeToken.data.access_token }, 200);
     }
   );
