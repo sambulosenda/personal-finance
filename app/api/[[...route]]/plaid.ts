@@ -64,25 +64,22 @@ const app = new Hono()
     ),
     async (c) => {
       const auth = getAuth(c);
-
       const { publicToken } = c.req.valid("json");
 
       if (!auth?.userId) {
-        return c.json({ error: "Not authenticated" }, 401);
+        return c.json({ error: "Unauthorized" }, 401);
       }
 
-      // Exchange the public token for an access token
-      const exchangeToken = await client.itemPublicTokenExchange({
+      const exchange = await client.itemPublicTokenExchange({
         public_token: publicToken,
       });
 
-      // Store the access token in the database
       const [connectedBank] = await db
         .insert(connectedBanks)
         .values({
           id: createId(),
           userId: auth.userId,
-          accessToken: exchangeToken.data.access_token,
+          accessToken: exchange.data.access_token,
         })
         .returning();
 
@@ -102,8 +99,8 @@ const app = new Hono()
           plaidAccounts.data.accounts.map((account) => ({
             id: createId(),
             name: account.name,
+            plaidId: account.account_id,
             userId: auth.userId,
-            plaidID: account.account_id,
           }))
         )
         .returning();
@@ -114,8 +111,8 @@ const app = new Hono()
           plaidCategories.data.categories.map((category) => ({
             id: createId(),
             name: category.hierarchy.join(", "),
+            plaidId: category.category_id,
             userId: auth.userId,
-            plaidID: category.category_id,
           }))
         )
         .returning();

@@ -15,6 +15,7 @@ import { useCreateCategory } from "@/features/categories/api/use-create-category
 import { useGetAccounts } from "@/features/accounts/api/use-get-accounts";
 import { useCreateAccount } from "@/features/accounts/api/use-create-account";
 import { TransactionForm } from "./transaction-form";
+import { Loader2 } from "lucide-react";
 
 const formSchema = insertTransactionSchema.omit({
   id: true,
@@ -53,6 +54,9 @@ export const NewTransactionSheet = () => {
     categoryMutation.isPending ||
     accountMutation.isPending;
 
+
+      const isLoading = categoryQuery.isLoading || accountQuery.isLoading;
+
   const onSubmit = (values: FormValues) => {
     createMutation.mutate(values, {
       onSuccess: () => {
@@ -68,6 +72,13 @@ export const NewTransactionSheet = () => {
           <SheetTitle>New Transaction</SheetTitle>
           <SheetDescription>Create a new transaction</SheetDescription>
         </SheetHeader>
+
+        {isLoading ? (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Loader2 className="size-4 text-muted-foreground animate-spin" />
+            </div>
+          )
+          : (
         <TransactionForm
           onSubmit={onSubmit}
           disabled={isPending}
@@ -76,6 +87,8 @@ export const NewTransactionSheet = () => {
           accountOptions={accountOptions}
           onCreateAccount={onCreateAccount}
         />
+          )
+        }
       </SheetContent>
     </Sheet>
   );
