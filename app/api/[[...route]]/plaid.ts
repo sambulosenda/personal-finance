@@ -125,11 +125,9 @@ const app = new Hono()
           const account = newAccounts.find(
             (account) => account.plaidId === transaction.account_id
           );
-          
           const category = newCategories.find(
             (category) => category.plaidId === transaction.category_id
           );
-
           const amountInMiliunits = convertAmountToMiliunits(
             transaction.amount
           );
@@ -158,4 +156,5 @@ const app = new Hono()
       return c.json({ ok: true }, 200);
     }
   );
+
 export default app;

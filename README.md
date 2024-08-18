@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+ Finance SaaS Platform with ability to track your income and expenses, categorize transactions and assign them to specific accounts
 
 ## Getting Started
 
